@@ -68,8 +68,8 @@ pip install -r requirements.txt
 ### 4. **Run the python scripts to explore the chatbot:**
 ```bash
 cd python_scripts; 
-populate_db.py
-query_data.py
+python populate_db.py
+python query_data.py <"Chatbot question">
 ```
 
 ### 5. **Evaluation and Testing:**
