@@ -1,6 +1,6 @@
 # 🧑🏽‍🍳 ChefBot: Your trusted AI-powered chef
 
-ChefBot is an **AI-powered chatbot** designed to assist with cooking-related queries. Whether you're looking for recipe ideas, cooking techniques, or ingredient substitutions, ChefBot is here to help! This project leverages large language model (LLM) to generate responses based on retrieved documents to deliver intelligent, context-aware responses.
+ChefBot is an **AI-powered chatbot** designed to assist with cooking-related queries. Whether you're looking for recipe ideas, cooking techniques, or ingredient substitutions, ChefBot is here to help! This project leverages a large language model (LLM) to generate context-aware, intelligent responses by processing both user input and relevant cooking resources.
 
 ## Features
 
