@@ -1,18 +1,18 @@
 # System libraries
 import os
+import openai
 
 # GenAI
-import chromadb
-from langchain.document_loaders import PyPDFDirectoryLoader 
-from langchain.embeddings import OpenAIEmbeddings
+from langchain.document_loaders import PyPDFLoader 
+from langchain_openai import OpenAIEmbeddings
 from langchain.schema.document import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
-from sentence_transformers import SentenceTransformer
+from dotenv import load_dotenv
 
 # const
 CHROMA_PATH = "../chroma"
-DATA_PATH = "../data"
+DATA_PATH = "../data/Student-Cookbook.pdf"
 
 def main():
     """
@@ -28,7 +28,7 @@ def load_documents():
     """
     Load pdf document from ../data
     """
-    loader = PyPDFDirectoryLoader(DATA_PATH)
+    loader = PyPDFLoader(DATA_PATH)
     return loader.load()
 
 def split_documents(documents: list[Document]):
@@ -36,53 +36,26 @@ def split_documents(documents: list[Document]):
     Splits the document into chunks
     """
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size = 800,
-        chunk_overlap = 80,
+        chunk_size = 1000,
+        chunk_overlap = 200,
         length_function =len,
         is_separator_regex=False,
     )
     return text_splitter.split_documents(documents)
 
-def get_embedding_function():
-    """
-    Creating embedding with all-MiniLM-L6-v2
-    """
-    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-    return model.encode
-
-def add_to_chroma(chunks):
-    embeddings = OpenAIEmbeddings()
-    vectorstore = Chroma(persist_directory=CHROMA_PATH, embedding_function=embeddings)
-    vectorstore.add_documents(chunks)
-    vectorstore.persist()
 
 def add_to_chroma(chunks: list[Document]):
     """
     Initialize ChromaDB client, prepares the chunks and add them to the VectorDB
     """
-    # Initialize ChromaDB client
-    client = chromadb.PersistentClient(path=CHROMA_PATH)
-    collection = client.get_or_create_collection(name="cookbook")
+    load_dotenv()
+    api_key = os.getenv("OPENAI_API_KEY") 
+    openai.api_key = api_key
 
-    # Preparing to be added in ChromaDB
-    documents = []
-    metadata = []
-    ids = []
+    embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
 
-    i = 0
+    return Chroma.from_documents(chunks, embeddings, persist_directory=CHROMA_PATH)
 
-    for chunk in chunks:
-        documents.append(chunk.page_content)
-        ids.append("ID"+str(i))
-        metadata.append(chunk.metadata)
-        i+=1
-
-    collection.upsert(
-        documents=documents,
-        metadatas = metadata,
-        ids=ids
-    )
-    
 
 if __name__ == "__main__":
     main()
